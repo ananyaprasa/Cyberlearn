@@ -28,9 +28,12 @@ console.log("KEY CHECK:", process.env.GEMINI_API_KEY);
 
 const app = express();
 
+// Trust proxy — required for rate limiting and cookies behind Render/Vercel/nginx
+app.set("trust proxy", 1);
+
 // Middlewares
 app.use(cors({
-  origin: ["https://your-frontend.vercel.app"],
+  origin: process.env.FRONTEND_URL || true, // true = allow all origins (safe behind auth)
   credentials: true
 }));
 

@@ -44,12 +44,12 @@ export default function Auth() {
     setIsLoggingIn(true);
 
     try {
+      // Ensure CSRF token is fresh before any state-changing request
+      await apiService.initializeCsrf();
       const response = await apiService.auth.login({ email, password });
-      // response now only contains { user } - no token since it's in httpOnly cookie
       authLogin(response.user);
       navigate("/");
     } catch (error) {
-      console.error('Login failed:', error);
       alert(error.message || "Login failed. Please check your credentials.");
     } finally {
       setIsLoggingIn(false);
@@ -66,13 +66,12 @@ export default function Auth() {
     setIsLoggingIn(true);
 
     try {
+      await apiService.initializeCsrf();
       await apiService.auth.register({ name: username, email, password, role });
-      // After register, log in automatically
       const response = await apiService.auth.login({ email, password });
       authLogin(response.user);
       navigate("/");
     } catch (error) {
-      console.error('Register failed:', error);
       alert(error.message || "Registration failed.");
     } finally {
       setIsLoggingIn(false);

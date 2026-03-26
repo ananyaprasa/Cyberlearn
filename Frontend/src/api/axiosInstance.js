@@ -10,7 +10,7 @@ export const getCsrfToken = () => csrfToken;
 
 // Create Axios instance with base configuration
 const axiosInstance = axios.create({
-  baseURL: `${import.meta.env.VITE_API_URL || 'http://localhost:5000/'}api`,
+  baseURL: `${(import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/$/, '')}/api`,
   timeout: 30000, // increased for file uploads
   withCredentials: true,
   headers: {
