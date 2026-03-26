@@ -33,7 +33,7 @@ app.set("trust proxy", 1);
 
 // Middlewares
 app.use(cors({
-  origin: process.env.FRONTEND_URL || true, // true = allow all origins (safe behind auth)
+  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
   credentials: true
 }));
 

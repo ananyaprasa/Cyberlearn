@@ -82,11 +82,13 @@ export const login = async (req, res) => {
       { expiresIn: "7d" }
     );
 
+    const isProduction = process.env.NODE_ENV === 'production';
+
     // Set httpOnly cookie instead of returning token
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false, // use true in production with HTTPS
-      sameSite: "Lax",
+      secure: isProduction,           // must be true in production (HTTPS)
+      sameSite: isProduction ? "None" : "Lax", // cross-domain needs "None"
       path: "/",
       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     });
@@ -130,10 +132,11 @@ export const getMe = async (req, res) => {
 export const logout = async (req, res) => {
   try {
     // Clear the httpOnly cookie with EXACT match of login cookie options
+    const isProduction = process.env.NODE_ENV === 'production';
     res.clearCookie("token", {
       httpOnly: true,
-      secure: false,
-      sameSite: "Lax",
+      secure: isProduction,
+      sameSite: isProduction ? "None" : "Lax",
       path: "/"
     });
 
