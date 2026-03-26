@@ -1,0 +1,486 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne+Mono&family=Sora:wght@400;500;600;700;800&family=Oxanium:wght@300;400;500;600;700&display=swap');
+
+/* ─── Animations ──────────────────────────────────────── */
+@keyframes shimmer-move {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes scan-move {
+  0% {
+    top: -60px;
+  }
+  100% {
+    top: 100%;
+  }
+}
+
+/* ─── Variables (mirrors Dashboard) ─────────────────── */
+:root {
+  --green:        #2dd68f;
+  --teal:         #02a89a;
+  --teal-dark:    #016B61;
+  --bg:           #070d0c;
+  --surface:      rgba(13, 20, 19, 0.7);
+  --border:       rgba(1, 107, 97, 0.2);
+  --border-hover: rgba(45, 214, 143, 0.3);
+  --text:         #e2e8f0;
+  --muted:        #6b7f7d;
+  --radius:       10px;
+  --radius-lg:    14px;
+}
+
+/* ─── Page wrapper ───────────────────────────────────── */
+.classrooms-page-wrapper {
+  min-height: 100vh;
+  position: relative;
+  background-color: #083B33;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25' viewBox='0 0 800 400'%3E%3Cdefs%3E%3CradialGradient id='a' cx='396' cy='281' r='514' gradientUnits='userSpaceOnUse'%3E%3Cstop offset='0' stop-color='%23185541'/%3E%3Cstop offset='1' stop-color='%23083B33'/%3E%3C/radialGradient%3E%3ClinearGradient id='b' gradientUnits='userSpaceOnUse' x1='400' y1='148' x2='400' y2='333'%3E%3Cstop offset='0' stop-color='%238ACF63' stop-opacity='0'/%3E%3Cstop offset='1' stop-color='%238ACF63' stop-opacity='0.5'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23a)' width='800' height='400'/%3E%3Cg fill-opacity='0.12'%3E%3Ccircle fill='url(%23b)' cx='267.5' cy='61' r='300'/%3E%3Ccircle fill='url(%23b)' cx='532.5' cy='61' r='300'/%3E%3Ccircle fill='url(%23b)' cx='400' cy='30' r='300'/%3E%3C/g%3E%3C/svg%3E");
+  background-attachment: fixed;
+  background-size: cover;
+}
+
+.classrooms-container {
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 60px 2rem 4rem;
+  font-family: 'Oxanium', sans-serif;
+  color: var(--text);
+}
+
+/* ─── Header ─────────────────────────────────────────── */
+.classrooms-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 2rem;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.header-content h1 {
+  font-family: 'Sora', sans-serif;
+  font-size: 2.25rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #bad6cc;
+  text-shadow: 0 0 20px rgba(186, 214, 204, 0.4);
+  margin: 0 0 0.35rem 0;
+}
+
+.header-content p {
+  color: #B6C2BD;
+  font-size: 0.9rem;
+  margin: 0;
+  letter-spacing: 0.03em;
+}
+
+.header-actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* ─── Buttons ─────────────────────────────────────────── */
+.cls-btn-primary {
+  font-family: 'Oxanium', sans-serif;
+  padding: 12px 24px;
+  background: #017a6f;
+  color: #ffffff;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.cls-btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s ease, height 0.6s ease;
+}
+
+.cls-btn-primary:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.cls-btn-primary:hover {
+  background: #02a89a;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(2, 168, 154, 0.4);
+}
+
+.cls-btn-primary:active {
+  transform: translateY(0);
+}
+
+/* Legacy create-btn for backwards compatibility */
+.create-btn {
+  font-family: 'Oxanium', sans-serif;
+  padding: 12px 24px;
+  background: rgba(0, 255, 156, 0.15);
+  color: #d7fced;
+  border: 1px solid rgba(0, 255, 156, 0.3);
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.create-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s ease, height 0.6s ease;
+}
+
+.create-btn:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.create-btn:hover {
+  background: rgba(0, 255, 156, 0.2);
+  border-color: rgba(0, 255, 156, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 255, 156, 0.3);
+}
+
+.create-btn:active {
+  transform: translateY(0);
+}
+
+/* ─── Classroom Grid ──────────────────────────────────── */
+.classrooms-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.25rem;
+}
+
+/* ─── Classroom Card ──────────────────────────────────── */
+.classroom-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  backdrop-filter: blur(12px);
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.classroom-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--green), var(--teal));
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.classroom-card:hover {
+  border-color: var(--border-hover);
+  box-shadow: 0 6px 28px rgba(0, 0, 0, 0.25);
+  transform: translateY(-2px);
+}
+
+.classroom-card:hover::before { opacity: 0.7; }
+
+.classroom-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.classroom-header h3 {
+  font-family: 'Oxanium', sans-serif;
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.4;
+  flex: 1;
+}
+
+.classroom-code {
+  font-family: 'Oxanium', monospace;
+  padding: 0.25rem 0.6rem;
+  background: rgba(45, 214, 143, 0.1);
+  border: 1px solid var(--border-hover);
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 400;
+  color: var(--green);
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+}
+
+.classroom-badge {
+  padding: 0.25rem 0.7rem;
+  background: rgba(2, 168, 154, 0.12);
+  border: 1px solid rgba(2, 168, 154, 0.3);
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--teal);
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.classroom-description {
+  color: var(--muted);
+  font-size: 0.85rem;
+  line-height: 1.6;
+  margin: 0 0 1rem 0;
+  min-height: 2.7em;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.classroom-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--border);
+  margin-top: auto;
+  flex-wrap: wrap;
+}
+
+.classroom-subject,
+.classroom-teacher,
+.classroom-students {
+  font-size: 0.78rem;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-weight: 500;
+}
+
+.classroom-assignments {
+  margin-top: 0.75rem;
+  padding: 0.55rem 0.85rem;
+  background: rgba(1, 107, 97, 0.1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 0.78rem;
+  color: var(--muted);
+  font-weight: 500;
+  text-align: center;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.classroom-card:hover .classroom-assignments {
+  border-color: var(--border-hover);
+  color: var(--teal);
+}
+
+/* ─── Empty State ─────────────────────────────────────── */
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--muted);
+  font-size: 0.95rem;
+  grid-column: 1 / -1;
+}
+
+/* ─── Modal ───────────────────────────────────────────── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1.25rem;
+}
+
+.modal-content {
+  background: rgba(10, 16, 15, 0.96);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  max-width: 480px;
+  width: 100%;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
+}
+
+.modal-content h2 {
+  font-family: 'Sora', sans-serif;
+  margin: 0 0 1.5rem 0;
+  font-size: 1.5rem;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  background: linear-gradient(135deg, var(--green), var(--teal));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.modal-content .form-group {
+  margin-bottom: 1.1rem;
+}
+
+.modal-content label {
+  display: block;
+  margin-bottom: 0.4rem;
+  color: var(--muted);
+  font-weight: 500;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+.modal-content input,
+.modal-content textarea,
+.modal-content select {
+  width: 100%;
+  padding: 0.7rem 0.9rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: 'Oxanium', sans-serif;
+  font-size: 0.9rem;
+  transition: border-color 0.2s, background 0.2s;
+  box-sizing: border-box;
+}
+
+.modal-content input:focus,
+.modal-content textarea:focus,
+.modal-content select:focus {
+  outline: none;
+  border-color: var(--border-hover);
+  background: rgba(45, 214, 143, 0.04);
+  box-shadow: 0 0 0 3px rgba(45, 214, 143, 0.06);
+}
+
+.modal-content select option {
+  background: #0a100f;
+  color: var(--text);
+}
+
+.modal-content textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.modal-hint {
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-top: 0.4rem;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-top: 1.5rem;
+}
+
+.modal-actions button {
+  height: 48px;
+  padding: 0 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+}
+
+.cancel-btn,
+.submit-btn {
+  flex: 1;
+  border-radius: var(--radius);
+  font-family: 'Oxanium', sans-serif;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  border: 1px solid;
+  transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+.cancel-btn {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: var(--muted);
+}
+
+.cancel-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.submit-btn {
+  background: rgba(45, 214, 143, 0.12);
+  border-color: var(--border-hover);
+  color: var(--green);
+}
+
+.submit-btn:hover {
+  background: rgba(45, 214, 143, 0.2);
+  box-shadow: 0 4px 16px rgba(45, 214, 143, 0.15);
+}
+
+.submit-btn:active { 
+  background: rgba(45, 214, 143, 0.25);
+}
+
+/* ─── Responsive ─────────────────────────────────────── */
+@media (max-width: 768px) {
+  .classrooms-container { padding: 40px 1.25rem 3rem; }
+  .classrooms-header { flex-direction: column; align-items: stretch; }
+  .header-content h1 { font-size: 1.75rem; }
+  .classrooms-grid { grid-template-columns: 1fr; }
+  .modal-content { padding: 1.5rem; }
+  .modal-actions { flex-direction: column; }
+}
+
+@media (max-width: 480px) {
+  .header-content h1 { font-size: 1.5rem; }
+  .create-btn { width: 100%; text-align: center; }
+}

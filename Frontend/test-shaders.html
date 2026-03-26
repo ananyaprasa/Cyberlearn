@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shader Gradients Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #0d0d0d;
+            color: #e0e0e0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .section {
+            margin: 2rem 0;
+            padding: 3rem;
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+        
+        .about { background: #0d0d0d; }
+        .threats { background: #0a0f0a; }
+        .domains { background: #0d0d0d; }
+        
+        .content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: #ffffff;
+        }
+        
+        p {
+            color: #9ca3af;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <h1>Shader Gradients Implementation</h1>
+    
+    <div class="section about">
+        <div class="content">
+            <h2>About Section</h2>
+            <p>This section uses the "about" variant shader gradient with teal and green tones.</p>
+        </div>
+    </div>
+    
+    <div class="section threats">
+        <div class="content">
+            <h2>Threats Section</h2>
+            <p>This section uses the "threats" variant shader gradient with more vibrant green colors.</p>
+        </div>
+    </div>
+    
+    <div class="section domains">
+        <div class="content">
+            <h2>Domains Section</h2>
+            <p>This section uses the "domains" variant shader gradient with cyan and teal colors.</p>
+        </div>
+    </div>
+    
+    <div class="section">
+        <div class="content">
+            <h2>Features Cards</h2>
+            <p>Individual feature cards also have their own shader gradients with the "features" variant.</p>
+        </div>
+    </div>
+</body>
+</html>

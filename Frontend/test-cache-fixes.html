@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cache System Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #0a0a0a;
+            color: #e0e0e0;
+        }
+        .test-section {
+            background: rgba(45, 214, 143, 0.1);
+            border: 1px solid rgba(45, 214, 143, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        button {
+            background: #2dd68f;
+            color: #0a0a0a;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+            font-weight: 600;
+        }
+        button:hover {
+            background: #25b87a;
+        }
+        .result {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .success { color: #2dd68f; }
+        .error { color: #ff4444; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Cache System Test - Fixed Version</h1>
+    <p>This page tests the fixed cache system to verify all issues are resolved.</p>
+
+    <div class="test-section">
+        <h3>Test 1: Basic Cache Operations</h3>
+        <button onclick="testBasicCache()">Test Basic Cache</button>
+        <div id="basic-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test 2: Challenge Solving</h3>
+        <button onclick="testChallengeSolving()">Test Challenge Solving</button>
+        <div id="challenge-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test 3: Dashboard Stats</h3>
+        <button onclick="testDashboardStats()">Test Dashboard Stats</button>
+        <div id="stats-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test 4: Error Handling</h3>
+        <button onclick="testErrorHandling()">Test Error Handling</button>
+        <div id="error-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test 5: Real-Time Updates</h3>
+        <button onclick="testRealTimeUpdates()">Test Real-Time Updates</button>
+        <div id="realtime-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Reset & Clean Up</h3>
+        <button onclick="resetProgress()">Reset All Progress</button>
+        <div id="reset-result" class="result"></div>
+    </div>
+
+    <script type="module">
+        // Import the cache functions (simulated - in real app these would be imported)
+        // For testing, we'll copy the essential functions here
+
+        const CACHE_KEY = 'cyberlearn_progress';
+
+        const challengesData = [
+            {
+                id: "base64",
+                title: "Base64 Basics",
+                category: "Cryptography",
+                points: 50,
+                difficulty: "easy"
+            },
+            {
+                id: "hidden-html",
+                title: "Hidden in Plain Sight",
+                category: "OSINT",
+                points: 100,
+                difficulty: "easy"
+            }
+        ];
+
+        const getProgress = () => {
+            try {
+                const stored = localStorage.getItem(CACHE_KEY);
+                if (stored) {
+                    return JSON.parse(stored);
+                }
+            } catch (error) {
+                console.error('Error reading progress:', error);
+            }
+            
+            return {
+                solvedChallenges: {},
+                totalPoints: 0,
+                streak: 0,
+                lastActivity: null,
+                achievements: {
+                    firstBlood: false,
+                    cryptoNovice: false,
+                    osintExpert: false,
+                    speedDemon: false,
+                    persistent: false
+                }
+            };
+        };
+
+        const saveProgress = (progress) => {
+            try {
+                localStorage.setItem(CACHE_KEY, JSON.stringify(progress));
+                window.dispatchEvent(new CustomEvent('progressUpdated', { detail: progress }));
+                return true;
+            } catch (error) {
+                console.error('Error saving progress:', error);
+                return false;
+            }
+        };
+
+        const markChallengeSolved = (challengeId) => {
+            try {
+                const progress = getProgress();
+                const challenge = challengesData.find(c => c.id === challengeId);
+                
+                if (!challenge) {
+                    throw new Error('Challenge not found: ' + challengeId);
+                }
+                
+                if (!progress.solvedChallenges) {
+                    progress.solvedChallenges = {};
+                }
+                
+                if (progress.solvedChallenges[challengeId]) {
+                    return progress; // Already solved
+                }
+                
+                progress.solvedChallenges[challengeId] = {
+                    solvedAt: new Date().toISOString(),
+                    points: challenge.points,
+                    difficulty: challenge.difficulty,
+                    category: challenge.category,
+                    title: challenge.title
+                };
+                
+                progress.totalPoints = (progress.totalPoints || 0) + challenge.points;
+                progress.lastActivity = new Date().toISOString();
+                
+                // Update achievements
+                const solvedCount = Object.keys(progress.solvedChallenges).length;
+                if (solvedCount >= 1) {
+                    progress.achievements.firstBlood = true;
+                }
+                
+                saveProgress(progress);
+                return progress;
+            } catch (error) {
+                console.error('Error marking challenge solved:', error);
+                return getProgress();
+            }
+        };
+
+        const getDashboardStats = () => {
+            try {
+                const progress = getProgress();
+                
+                if (!progress || typeof progress !== 'object') {
+                    throw new Error('Invalid progress structure');
+                }
+                
+                const solvedChallenges = Object.values(progress.solvedChallenges || {});
+                const validSolvedChallenges = solvedChallenges.filter(challenge => 
+                    challenge && typeof challenge === 'object' && challenge.solvedAt
+                );
+                
+                return {
+                    totalPoints: progress.totalPoints || 0,
+                    solvedCount: validSolvedChallenges.length,
+                    totalChallenges: challengesData.length,
+                    streak: progress.streak || 0,
+                    achievements: {
+                        firstBlood: false,
+                        cryptoNovice: false,
+                        osintExpert: false,
+                        speedDemon: false,
+                        persistent: false,
+                        ...(progress.achievements || {})
+                    },
+                    recentCompletions: validSolvedChallenges
+                        .sort((a, b) => new Date(b.solvedAt) - new Date(a.solvedAt))
+                        .slice(0, 5)
+                };
+            } catch (error) {
+                console.error('Error getting dashboard stats:', error);
+                return {
+                    totalPoints: 0,
+                    solvedCount: 0,
+                    totalChallenges: challengesData.length,
+                    streak: 0,
+                    achievements: {
+                        firstBlood: false,
+                        cryptoNovice: false,
+                        osintExpert: false,
+                        speedDemon: false,
+                        persistent: false
+                    },
+                    recentCompletions: []
+                };
+            }
+        };
+
+        // Test functions
+        window.testBasicCache = () => {
+            const result = document.getElementById('basic-result');
+            try {
+                // Test 1: Save and retrieve progress
+                const testProgress = {
+                    solvedChallenges: {},
+                    totalPoints: 0,
+                    streak: 0,
+                    achievements: { firstBlood: false }
+                };
+                
+                const saved = saveProgress(testProgress);
+                const retrieved = getProgress();
+                
+                if (saved && retrieved.totalPoints === 0) {
+                    result.innerHTML = '<span class="success">✅ Basic cache operations working correctly</span>';
+                    result.innerHTML += '\nSaved: ' + JSON.stringify(testProgress, null, 2);
+                    result.innerHTML += '\nRetrieved: ' + JSON.stringify(retrieved, null, 2);
+                } else {
+                    throw new Error('Cache save/retrieve failed');
+                }
+            } catch (error) {
+                result.innerHTML = '<span class="error">❌ Basic cache test failed: ' + error.message + '</span>';
+            }
+        };
+
+        window.testChallengeSolving = () => {
+            const result = document.getElementById('challenge-result');
+            try {
+                // Reset first
+                localStorage.removeItem(CACHE_KEY);
+                
+                // Test solving a challenge
+                const progress = markChallengeSolved('base64');
+                
+                if (progress.solvedChallenges['base64'] && progress.totalPoints === 50) {
+                    result.innerHTML = '<span class="success">✅ Challenge solving working correctly</span>';
+                    result.innerHTML += '\nProgress after solving base64:';
+                    result.innerHTML += '\nTotal Points: ' + progress.totalPoints;
+                    result.innerHTML += '\nSolved Challenges: ' + Object.keys(progress.solvedChallenges).length;
+                    result.innerHTML += '\nFirst Blood Achievement: ' + progress.achievements.firstBlood;
+                } else {
+                    throw new Error('Challenge solving failed');
+                }
+            } catch (error) {
+                result.innerHTML = '<span class="error">❌ Challenge solving test failed: ' + error.message + '</span>';
+            }
+        };
+
+        window.testDashboardStats = () => {
+            const result = document.getElementById('stats-result');
+            try {
+                // Ensure we have some progress
+                markChallengeSolved('base64');
+                markChallengeSolved('hidden-html');
+                
+                const stats = getDashboardStats();
+                
+                if (stats && stats.totalPoints === 150 && stats.solvedCount === 2) {
+                    result.innerHTML = '<span class="success">✅ Dashboard stats working correctly</span>';
+                    result.innerHTML += '\nStats: ' + JSON.stringify(stats, null, 2);
+                } else {
+                    throw new Error('Dashboard stats calculation failed');
+                }
+            } catch (error) {
+                result.innerHTML = '<span class="error">❌ Dashboard stats test failed: ' + error.message + '</span>';
+            }
+        };
+
+        window.testErrorHandling = () => {
+            const result = document.getElementById('error-result');
+            try {
+                // Test with corrupted data
+                localStorage.setItem(CACHE_KEY, 'invalid json');
+                
+                const progress = getProgress();
+                const stats = getDashboardStats();
+                
+                if (progress && stats && stats.totalPoints === 0) {
+                    result.innerHTML = '<span class="success">✅ Error handling working correctly</span>';
+                    result.innerHTML += '\nSystem recovered from corrupted data';
+                    result.innerHTML += '\nFallback progress: ' + JSON.stringify(progress, null, 2);
+                } else {
+                    throw new Error('Error handling failed');
+                }
+            } catch (error) {
+                result.innerHTML = '<span class="error">❌ Error handling test failed: ' + error.message + '</span>';
+            }
+        };
+
+        window.testRealTimeUpdates = () => {
+            const result = document.getElementById('realtime-result');
+            let eventReceived = false;
+            
+            // Listen for progress update event
+            const listener = (event) => {
+                eventReceived = true;
+                result.innerHTML += '\n<span class="success">✅ Progress update event received</span>';
+                result.innerHTML += '\nEvent data: ' + JSON.stringify(event.detail, null, 2);
+            };
+            
+            window.addEventListener('progressUpdated', listener);
+            
+            try {
+                result.innerHTML = 'Testing real-time updates...';
+                
+                // Trigger a progress update
+                markChallengeSolved('base64');
+                
+                setTimeout(() => {
+                    if (eventReceived) {
+                        result.innerHTML += '\n<span class="success">✅ Real-time updates working correctly</span>';
+                    } else {
+                        result.innerHTML += '\n<span class="error">❌ Progress update event not received</span>';
+                    }
+                    window.removeEventListener('progressUpdated', listener);
+                }, 100);
+                
+            } catch (error) {
+                result.innerHTML = '<span class="error">❌ Real-time updates test failed: ' + error.message + '</span>';
+                window.removeEventListener('progressUpdated', listener);
+            }
+        };
+
+        window.resetProgress = () => {
+            const result = document.getElementById('reset-result');
+            try {
+                localStorage.removeItem(CACHE_KEY);
+                window.dispatchEvent(new CustomEvent('progressUpdated', { detail: getProgress() }));
+                result.innerHTML = '<span class="success">✅ Progress reset successfully</span>';
+            } catch (error) {
+                result.innerHTML = '<span class="error">❌ Reset failed: ' + error.message + '</span>';
+            }
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,553 @@
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Oxanium:wght@300;400;500;600;700&display=swap');
+
+/* ===================================
+   PAGE WRAPPER — matches Assignments
+=================================== */
+.grade-page-wrapper {
+  min-height: 100vh;
+  position: relative;
+  background-color: #2b403a;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%23e8eccf' fill-opacity='0.03'%3E%3Cpath opacity='.5' d='M96 95h4v1h-4v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9zm-1 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9z'/%3E%3Cpath d='M6 5V0H5v5H0v1h5v94h1V6h94V5H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  overflow: hidden;
+}
+
+.grade-page-wrapper::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0,0,0,0.03) 0px,
+    rgba(0,0,0,0.03) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.5;
+}
+
+.grade-page-wrapper::after {
+  content: '';
+  position: fixed;
+  top: -50%; left: -50%;
+  width: 200%; height: 200%;
+  background: radial-gradient(ellipse at center, rgba(137,171,155,0.08) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+  animation: gradeAmbient 18s ease-in-out infinite;
+}
+
+@keyframes gradeAmbient {
+  0%, 100% { transform: translate(0,0) rotate(0deg); opacity: 0.6; }
+  50% { transform: translate(-5%,5%) rotate(180deg); opacity: 0.8; }
+}
+
+/* ===================================
+   CONTAINER
+=================================== */
+.grade-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 60px 24px 60px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ===================================
+   BACK BUTTON
+=================================== */
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 18px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  color: #9fbdb2;
+  font-family: 'Sora', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 28px;
+}
+
+.back-btn:hover {
+  background: rgba(0,255,156,0.08);
+  border-color: rgba(0,255,156,0.2);
+  color: #d7fced;
+  transform: translateX(-2px);
+}
+
+/* ===================================
+   PAGE HEADER
+=================================== */
+.grade-page-header {
+  margin-bottom: 32px;
+}
+
+.grade-page-title {
+  font-family: 'Sora', sans-serif;
+  font-size: 40px;
+  font-weight: 700;
+  color: #9fbfb7;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-shadow: 0 0 25px rgba(159,191,183,0.5), 0 0 50px rgba(159,191,183,0.25);
+  margin: 0 0 6px 0;
+}
+
+.grade-page-subtitle {
+  font-family: 'Sora', sans-serif;
+  font-size: 14px;
+  color: #a4aba8;
+  margin: 0;
+  font-weight: 400;
+}
+
+/* ===================================
+   TWO-COLUMN LAYOUT
+=================================== */
+.grade-layout {
+  display: grid;
+  grid-template-columns: 1fr 420px;
+  gap: 24px;
+  align-items: start;
+}
+
+.grade-left {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.grade-right {
+  position: sticky;
+  top: 80px;
+}
+
+/* ===================================
+   PANELS
+=================================== */
+.grade-panel {
+  background: rgba(17,25,40,0.75);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.grade-panel::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(45,214,143,0.4), transparent);
+}
+
+.grade-panel-label {
+  font-family: 'Sora', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #5a8070;
+  margin-bottom: 16px;
+}
+
+/* ===================================
+   STUDENT INFO
+=================================== */
+.student-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.student-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(45,214,143,0.2), rgba(2,168,154,0.2));
+  border: 1px solid rgba(45,214,143,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Sora', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #2dd68f;
+  flex-shrink: 0;
+}
+
+.student-name {
+  font-family: 'Sora', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: #f1f5f9;
+  margin-bottom: 2px;
+}
+
+.student-email {
+  font-family: 'Sora', sans-serif;
+  font-size: 13px;
+  color: #94a3b8;
+  margin-bottom: 4px;
+}
+
+.student-meta {
+  font-family: 'Sora', sans-serif;
+  font-size: 12px;
+  color: #64748b;
+}
+
+.already-graded-badge {
+  margin-top: 14px;
+  padding: 8px 14px;
+  background: rgba(16,185,129,0.1);
+  border: 1px solid rgba(16,185,129,0.25);
+  border-radius: 8px;
+  font-family: 'Sora', sans-serif;
+  font-size: 13px;
+  color: #34d399;
+  font-weight: 500;
+}
+
+/* ===================================
+   SUBMISSION CONTENT
+=================================== */
+.no-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px;
+  background: rgba(0,0,0,0.2);
+  border-radius: 10px;
+  color: #64748b;
+  font-family: 'Sora', sans-serif;
+  font-size: 14px;
+}
+
+.no-content-icon {
+  font-size: 20px;
+  opacity: 0.6;
+}
+
+.content-block {
+  margin-bottom: 16px;
+}
+
+.content-block:last-child {
+  margin-bottom: 0;
+}
+
+.content-block-label {
+  font-family: 'Sora', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+
+.content-text {
+  background: rgba(0,0,0,0.25);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 10px;
+  padding: 14px 16px;
+  color: #e2e8f0;
+  font-family: 'Sora', sans-serif;
+  font-size: 14px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.content-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #60a5fa;
+  font-family: 'Sora', sans-serif;
+  font-size: 14px;
+  text-decoration: none;
+  padding: 8px 14px;
+  background: rgba(96,165,250,0.08);
+  border: 1px solid rgba(96,165,250,0.2);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  word-break: break-all;
+}
+
+.content-link:hover {
+  background: rgba(96,165,250,0.15);
+  border-color: rgba(96,165,250,0.35);
+}
+
+/* Files */
+.file-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.file-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: rgba(0,0,0,0.2);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 8px;
+}
+
+.file-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.file-name {
+  flex: 1;
+  font-family: 'Sora', sans-serif;
+  font-size: 13px;
+  color: #cbd5e1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-download {
+  font-family: 'Sora', sans-serif;
+  font-size: 12px;
+  color: #2dd68f;
+  text-decoration: none;
+  padding: 4px 10px;
+  border: 1px solid rgba(45,214,143,0.25);
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.file-download:hover {
+  background: rgba(45,214,143,0.1);
+  border-color: rgba(45,214,143,0.4);
+}
+
+/* ===================================
+   GRADING FORM
+=================================== */
+.grade-form-panel {
+  border-color: rgba(139,92,246,0.15);
+}
+
+.grade-form-panel::before {
+  background: linear-gradient(90deg, transparent, rgba(139,92,246,0.4), transparent);
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: 'Sora', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #cbd5e1;
+  margin-bottom: 8px;
+}
+
+.form-label-hint {
+  font-size: 11px;
+  font-weight: 400;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Grade input row */
+.grade-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.grade-input {
+  flex: 1;
+  padding: 12px 16px;
+  background: rgba(0,0,0,0.35);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  color: #f1f5f9;
+  font-family: 'Sora', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  outline: none;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.grade-input:focus {
+  border-color: rgba(139,92,246,0.4);
+  box-shadow: 0 0 0 3px rgba(139,92,246,0.1);
+}
+
+.grade-input::placeholder {
+  color: #334155;
+  font-size: 22px;
+}
+
+/* Remove number input arrows */
+.grade-input::-webkit-outer-spin-button,
+.grade-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.grade-input[type=number] { -moz-appearance: textfield; }
+
+.grade-input-suffix {
+  font-family: 'Sora', sans-serif;
+  font-size: 16px;
+  color: #64748b;
+  white-space: nowrap;
+}
+
+/* Progress bar */
+.grade-progress {
+  margin-top: 8px;
+  height: 4px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.grade-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #2dd68f, #02a89a);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+/* Feedback textarea — auto-grow, no manual resize */
+.feedback-textarea {
+  width: 100%;
+  padding: 12px 16px;
+  background: rgba(0,0,0,0.35);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  color: #f1f5f9;
+  font-family: 'Sora', sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  outline: none;
+  resize: none;
+  overflow: hidden;
+  min-height: 80px;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.feedback-textarea:focus {
+  border-color: rgba(139,92,246,0.4);
+  box-shadow: 0 0 0 3px rgba(139,92,246,0.1);
+}
+
+.feedback-textarea::placeholder {
+  color: #334155;
+}
+
+/* Submit button */
+.submit-grade-btn {
+  width: 100%;
+  padding: 14px;
+  background: rgba(139,92,246,0.15);
+  border: 1px solid rgba(139,92,246,0.35);
+  border-radius: 10px;
+  color: #c4b5fd;
+  font-family: 'Sora', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.submit-grade-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 0; height: 0;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.08);
+  transform: translate(-50%,-50%);
+  transition: width 0.5s ease, height 0.5s ease;
+}
+
+.submit-grade-btn:hover::before {
+  width: 300px; height: 300px;
+}
+
+.submit-grade-btn:hover:not(.saving) {
+  background: rgba(139,92,246,0.25);
+  border-color: rgba(139,92,246,0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(139,92,246,0.2);
+}
+
+.submit-grade-btn.saving {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ===================================
+   LOADING STATE
+=================================== */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+}
+
+.loading-container p {
+  color: #d7fced;
+  font-family: 'Sora', sans-serif;
+  font-size: 1rem;
+  background: rgba(17,25,40,0.75);
+  padding: 20px 40px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+/* ===================================
+   RESPONSIVE
+=================================== */
+@media (max-width: 900px) {
+  .grade-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .grade-right {
+    position: static;
+  }
+
+  .grade-page-title {
+    font-size: 28px;
+  }
+}
+
+@media (max-width: 480px) {
+  .grade-container {
+    padding: 50px 16px 40px;
+  }
+}
