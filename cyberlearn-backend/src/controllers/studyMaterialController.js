@@ -23,7 +23,7 @@ const formatMaterial = (m) => ({
   id:           m._id.toString(),
   title:        m.title,
   originalName: m.originalName,
-  fileUrl:      `http://localhost:5000/uploads/${m.filePath}`,
+  fileUrl:      `${process.env.BACKEND_URL || 'http://localhost:5000'}/uploads/${m.filePath}`,
   fileSize:     m.fileSize,
   mimeType:     m.mimeType,
   uploadedBy:   m.uploadedBy,
