@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import './Chatbot.css';
 
-const API_URL = 'http://localhost:5000/api/chat';
+const API_URL = `${import.meta.env.VITE_API_URL}/api/chat`;
 const SESSION_KEY = 'cyberlearn_chat_history';
 
 const WELCOME = { id: 1, from: 'bot', text: "Hey there! 👋 I'm your CyberLearn Assistant. Ask me anything about the platform or cybersecurity topics!" };
