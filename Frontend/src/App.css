@@ -3602,3 +3602,98 @@ ooter Styles */
   from { opacity: 0.6; transform: scaleX(0.3); transform-origin: left; }
   to   { opacity: 1;   transform: scaleX(1);   transform-origin: left; }
 }
+
+/* ── Hints Panel ─────────────────────────────────────────────── */
+.hints-panel {
+  margin: 1rem 0 0.5rem;
+  padding: 0.75rem 1rem;
+  background: rgba(0, 255, 200, 0.04);
+  border: 1px solid rgba(0, 255, 200, 0.12);
+  border-radius: 8px;
+}
+
+.hints-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #00ffc8;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.5rem;
+}
+
+.hint-item {
+  margin-bottom: 0.5rem;
+}
+
+.hint-item:last-child {
+  margin-bottom: 0;
+}
+
+.hint-locked {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  color: #8a9bb0;
+}
+
+.hint-cost {
+  flex: 1;
+}
+
+.hint-unlock-btn {
+  background: rgba(255, 200, 0, 0.12);
+  border: 1px solid rgba(255, 200, 0, 0.4);
+  color: #ffc800;
+  border-radius: 5px;
+  padding: 0.2rem 0.65rem;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.hint-unlock-btn:hover:not(:disabled) {
+  background: rgba(255, 200, 0, 0.22);
+  border-color: #ffc800;
+}
+
+.hint-unlock-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.hint-unlocked {
+  background: rgba(0, 255, 200, 0.06);
+  border-radius: 6px;
+  padding: 0.4rem 0.6rem;
+}
+
+.hint-text {
+  font-size: 0.84rem;
+  color: #b0fce8;
+  display: flex;
+  gap: 0.4rem;
+  align-items: flex-start;
+}
+
+.hint-icon {
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.hint-msg {
+  font-size: 0.78rem;
+  margin-top: 0.25rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+}
+
+.hint-msg-success {
+  color: #00ffc8;
+  background: rgba(0, 255, 200, 0.08);
+}
+
+.hint-msg-error {
+  color: #ff6b6b;
+  background: rgba(255, 107, 107, 0.08);
+}

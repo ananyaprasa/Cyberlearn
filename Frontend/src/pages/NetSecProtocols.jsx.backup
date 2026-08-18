@@ -1,0 +1,524 @@
+﻿import { Suspense, useState, memo } from 'react';
+import { Link } from 'react-router-dom';
+import Navbar from '../components/Navbar';
+import { ShaderGradientCanvas, ShaderGradient } from '@shadergradient/react';
+import { NetworkSecurityIcon } from '../components/NetworkSecurityIcon';
+import QuestionCard from '../components/QuestionCard';
+import OSIModelDiagram from '../components/learning/network/OSIModelDiagram';
+import TcpIpMappingDiagram from '../components/learning/network/TcpIpMappingDiagram';
+import TCPHandshakeDiagram from '../components/learning/network/TCPHandshakeDiagram';
+import SynFloodDiagram from '../components/learning/network/SynFloodDiagram';
+import ArpDiagram from '../components/learning/network/ArpDiagram';
+import NatDiagram from '../components/learning/network/NatDiagram';
+import NetworkSecurityTopology from '../components/learning/network/NetworkSecurityTopology';
+import ProtocolMatcher from '../components/learning/network/ProtocolMatcher';
+import LessonCard from '../components/learning/ui/LessonCard';
+import InfoCard from '../components/learning/ui/InfoCard';
+import DiagramContainer from '../components/learning/ui/DiagramContainer';
+import ProtocolTable from '../components/learning/ui/ProtocolTable';
+import TerminalBlock from '../components/learning/ui/TerminalBlock';
+import LearningObjective from '../components/learning/ui/LearningObjective';
+import ConceptGrid from '../components/learning/ui/ConceptGrid';
+
+const SectionIntro = ({ children }) => (
+  <div className="section-intro">{children}</div>
+);
+
+const MCQBlock = ({ questions }) => (
+  <div className="mcq-block">
+    <h4 className="mcq-heading">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="mcq-icon">
+        <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2"/>
+        <path d="M12 8V12L14.5 14.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+      </svg>
+      Knowledge Check
+    </h4>
+    <div className="mcq-questions">
+      {questions.map((q, i) => (
+        <QuestionCard key={i} question={q.q} options={q.options} correctAnswer={q.answer} />
+      ))}
+    </div>
+  </div>
+);
+
+const ContinueLink = ({ to, label }) => (
+  <Link to={to} className="continue-link">
+    <span>Continue to:</span>
+    <strong>{label}</strong>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+      <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  </Link>
+);
+
+const LINKS = {
+  wireshark: { to: '/network-security/wireshark', label: 'Packet Analysis with Wireshark' },
+  mitm:      { to: '/network-security/mitm',      label: 'Man-in-the-Middle Attacks' },
+  firewall:  { to: '/network-security/firewall',   label: 'Firewall & IDS Evasion' },
+  recon:     { to: '/reconnaissance',              label: 'Reconnaissance & Port Scanning' },
+  osint:     { to: '/osint/passive',               label: 'Passive OSINT & DNS Enumeration' },
+};
+
+function OsiSection() {
+  return (
+    <LessonCard number="01" title="The OSI Model" subtitle="The 7-layer framework behind network communication">
+      <SectionIntro>
+        The OSI model divides network communication into seven layers. Security controls and
+        attacks map to specific layers — knowing which layer you're at tells you which tools
+        and defences apply.
+      </SectionIntro>
+      
+      <DiagramContainer title="Interactive OSI Layer Stack" subtitle="Click any layer to explore its details">
+        <OSIModelDiagram />
+      </DiagramContainer>
+
+      <ProtocolTable
+        title="OSI Layers Reference"
+        headers={['Layer', 'Name', 'PDU', 'Example Protocols', 'Example Attack']}
+        rows={[
+          ['7','Application','Data','HTTP, DNS, SMTP, SSH','SQL Injection, DNS tunnelling'],
+          ['6','Presentation','Data','TLS/SSL, JPEG, ASCII','SSL stripping, downgrade attacks'],
+          ['5','Session','Data','NetBIOS, RPC, SMB session','Session hijacking'],
+          ['4','Transport','Segment / Datagram','TCP, UDP','SYN flood, UDP flood'],
+          ['3','Network','Packet','IP, ICMP, OSPF, BGP','IP spoofing, route hijacking'],
+          ['2','Data Link','Frame','Ethernet, 802.11, ARP','ARP spoofing, MAC flooding'],
+          ['1','Physical','Bit','Ethernet cable, Wi-Fi, DSL','Cable tapping, jamming'],
+        ]}
+      />
+
+      <InfoCard type="tip" title="💡 Memory Aid">
+        <strong>"All People Seem To Need Data Processing"</strong> — Application, Presentation, 
+        Session, Transport, Network, Data Link, Physical (layers 7 to 1).
+      </InfoCard>
+
+      <MCQBlock questions={[
+        { q: 'At which OSI layer does IP addressing and routing between networks occur?', options: ['A. Layer 2 (Data Link)','B. Layer 3 (Network)','C. Layer 4 (Transport)','D. Layer 5 (Session)'], answer: 'B' },
+        { q: 'ARP spoofing attacks target which OSI layer?', options: ['A. Layer 1 (Physical)','B. Layer 3 (Network)','C. Layer 2 (Data Link)','D. Layer 7 (Application)'], answer: 'C' },
+        { q: 'A Web Application Firewall (WAF) operates at which OSI layer?', options: ['A. Layer 3','B. Layer 4','C. Layer 5','D. Layer 7'], answer: 'D' },
+        { q: 'TLS/SSL encryption operates primarily at which OSI layer?', options: ['A. Layer 3 (Network)','B. Layer 4 (Transport)','C. Layer 6 (Presentation)','D. Layer 7 (Application)'], answer: 'C' },
+        { q: 'Switches operate at which OSI layer and use which addressing type?', options: ['A. Layer 1, IP addresses','B. Layer 2, MAC addresses','C. Layer 3, IP addresses','D. Layer 4, port numbers'], answer: 'B' },
+      ]} />
+    </LessonCard>
+  );
+}
+
+function TcpIpSection() {
+  return (
+    <Panel id="tcpip" title="2. TCP/IP Model & IP Addressing">
+      <SectionIntro>
+        The TCP/IP model is the practical protocol stack that powers the internet. It condenses
+        the OSI model into four layers. IP addressing and subnetting are foundational skills
+        for network security work.
+      </SectionIntro>
+      <h3 className="nsp-subsection">OSI vs TCP/IP Layer Mapping</h3>
+      <TcpIpMappingDiagram />
+      <h3 className="nsp-subsection">IP Addressing &amp; Subnetting</h3>
+      <div className="nsp-concept-grid">
+        <KeyPoint label="IPv4">32-bit dotted decimal (e.g. <code>192.168.1.25</code>). ~4.3 billion addresses — exhausted, driving IPv6 adoption.</KeyPoint>
+        <KeyPoint label="IPv6">128-bit hexadecimal (e.g. <code>2001:db8::1</code>). ~340 undecillion addresses. Built-in IPsec support.</KeyPoint>
+        <KeyPoint label="Subnet Mask">Defines network vs host portion. Written as prefix length (<code>/24</code>) or dotted decimal (<code>255.255.255.0</code>).</KeyPoint>
+        <KeyPoint label="CIDR"><code>192.168.1.0/24</code> — first 24 bits are network, last 8 identify the host. Gives 254 usable addresses (.1 to .254).</KeyPoint>
+      </div>
+      <div className="nsp-cidr-example">
+        <div className="nsp-cidr-title">CIDR Example: <code>192.168.1.25/24</code></div>
+        <div className="nsp-cidr-row">
+          <div className="nsp-cidr-block nsp-cidr-network">
+            <span className="nsp-cidr-label">Network</span>
+            <code>192.168.1</code>
+            <span className="nsp-cidr-bits">24 bits</span>
+          </div>
+          <div className="nsp-cidr-dot">.</div>
+          <div className="nsp-cidr-block nsp-cidr-host">
+            <span className="nsp-cidr-label">Host</span>
+            <code>25</code>
+            <span className="nsp-cidr-bits">8 bits (256 addresses)</span>
+          </div>
+        </div>
+        <div className="nsp-cidr-note">Network: 192.168.1.0 | Broadcast: 192.168.1.255 | Usable hosts: .1&ndash;.254</div>
+      </div>
+      <h3 className="nsp-subsection">Private Address Ranges (RFC 1918)</h3>
+      <MiniTable
+        headers={['Range','CIDR','Addresses','Common Use']}
+        rows={[
+          ['10.0.0.0 – 10.255.255.255','10.0.0.0/8','16.7 million','Large enterprise networks'],
+          ['172.16.0.0 – 172.31.255.255','172.16.0.0/12','1.04 million','Mid-size networks'],
+          ['192.168.0.0 – 192.168.255.255','192.168.0.0/16','65,536','Home / small office'],
+        ]}
+      />
+      <p className="nsp-note">Private addresses are not routable on the public internet. NAT translates them to a public IP for outbound traffic.</p>
+      <h3 className="nsp-subsection">TTL and ICMP</h3>
+      <div className="nsp-concept-grid">
+        <KeyPoint label="TTL (Time To Live)">Decremented by 1 at each router hop. When it hits 0, the packet is dropped and an ICMP Time Exceeded message returns. Windows default TTL is 128; Linux is 64 — useful for passive OS fingerprinting.</KeyPoint>
+        <KeyPoint label="ICMP"><code>ping</code> sends Echo Requests; <code>traceroute</code> exploits TTL expiry to map hops. ICMP tunnelling can exfiltrate data through firewalls that allow ping.</KeyPoint>
+      </div>
+      <InfoBox type="warn">
+        <strong>Security implications:</strong> IP headers can be spoofed (source IP is not authenticated). Fragmented packets can bypass stateless firewalls. TCP sequence numbers were historically predictable, enabling session hijacking.
+      </InfoBox>
+      <MCQBlock questions={[
+        { q: 'What is the correct sequence of the TCP three-way handshake?', options: ['A. SYN, ACK, SYN-ACK','B. SYN, SYN-ACK, ACK','C. ACK, SYN, SYN-ACK','D. SYN-ACK, SYN, ACK'], answer: 'B' },
+        { q: 'What does IP provide that makes it a "best-effort" protocol?', options: ['A. Guaranteed delivery and ordering','B. Logical addressing and routing without guaranteeing delivery, order, or error correction','C. Encryption of all transmitted data','D. Authentication of the sender'], answer: 'B' },
+        { q: "Why does IPv6 exist as a successor to IPv4?", options: ["A. IPv6 is faster than IPv4","B. IPv4's 32-bit address space (~4.3 billion addresses) is exhausted; IPv6's 128-bit space solves this","C. IPv6 is more secure by default","D. IPv4 does not support wireless networks"], answer: 'B' },
+        { q: 'A host responds to ping with TTL=64. What OS does this suggest?', options: ['A. Windows (default TTL 128)','B. Linux/Unix (default TTL 64)','C. macOS (default TTL 255)','D. Cisco IOS (default TTL 255)'], answer: 'B' },
+        { q: 'Which CIDR prefix gives 254 usable host addresses?', options: ['A. /8','B. /16','C. /24','D. /32'], answer: 'C' },
+      ]} />
+      <ContinueLink {...LINKS.osint} />
+    </Panel>
+  );
+}
+
+function TcpSection() {
+  return (
+    <Panel id="tcp" title="3. How TCP Works">
+      <SectionIntro>
+        TCP provides reliable, ordered, error-checked delivery. It tracks every byte with
+        sequence numbers and retransmits anything lost. Understanding TCP internals is
+        essential for Wireshark analysis, SYN flood defences, and session security.
+      </SectionIntro>
+      <h3 className="nsp-subsection">Three-Way Handshake</h3>
+      <TCPHandshakeDiagram />
+      <h3 className="nsp-subsection">Key TCP Mechanisms</h3>
+      <div className="nsp-concept-grid">
+        <KeyPoint label="Sequence Numbers">Every byte is numbered. The receiver ACKs the next expected byte — enabling retransmission of anything lost and correct reassembly order.</KeyPoint>
+        <KeyPoint label="Sliding Window">Controls how much unacknowledged data can be in flight. Receiver advertises its window size to prevent buffer overflow. Larger window = higher throughput.</KeyPoint>
+        <KeyPoint label="Congestion Control">TCP backs off when it detects congestion (packet loss). Algorithms: slow start, AIMD, CUBIC. Prevents one connection from overwhelming the network.</KeyPoint>
+        <KeyPoint label="Connection Teardown">Four-way FIN exchange (FIN &#8594; ACK &#8594; FIN &#8594; ACK) closes gracefully. A RST packet abruptly terminates — used by firewalls and IDS to kill suspicious sessions.</KeyPoint>
+      </div>
+      <h3 className="nsp-subsection">SYN Flood Attack</h3>
+      <SynFloodDiagram />
+      <MCQBlock questions={[
+        { q: "A SYN flood exploits which characteristic of TCP?", options: ["A. TCP's use of port numbers","B. TCP's connection state — the server allocates resources for each half-open SYN without a completing ACK","C. TCP's sliding window mechanism","D. TCP's use of sequence numbers"], answer: 'B' },
+        { q: 'What is the purpose of TCP sequence numbers?', options: ['A. To identify source and destination ports','B. To track and acknowledge every byte, enabling retransmission and correct ordering','C. To encrypt the TCP payload','D. To determine maximum segment size'], answer: 'B' },
+        { q: 'How does a TCP RST differ from a FIN packet?', options: ['A. RST is encrypted; FIN is not','B. RST abruptly terminates a connection; FIN initiates a graceful four-way close','C. FIN is used for attacks; RST for legitimate close','D. They do the same thing'], answer: 'B' },
+        { q: 'What does the sliding window control?', options: ['A. The encryption algorithm','B. How much unacknowledged data can be in flight, preventing buffer overflow and improving throughput','C. The TTL of packets','D. The three-way handshake'], answer: 'B' },
+      ]} />
+      <ContinueLink {...LINKS.wireshark} />
+    </Panel>
+  );
+}
+
+function TcpUdpSection() {
+  return (
+    <Panel id="tcpvudp" title="4. TCP vs UDP">
+      <SectionIntro>
+        TCP and UDP are the two primary transport protocols. The choice between them is
+        about reliability semantics vs overhead — not simply speed.
+      </SectionIntro>
+      <div className="nsp-compare-grid">
+        <div className="nsp-compare-col nsp-compare-col--tcp">
+          <div className="nsp-compare-header">TCP</div>
+          <ul className="nsp-compare-list">
+            <li>Connection-oriented (three-way handshake)</li>
+            <li>Reliable — guarantees delivery via ACKs</li>
+            <li>Ordered — segments reassembled in sequence</li>
+            <li>Retransmits lost segments automatically</li>
+            <li>Flow control via sliding window</li>
+            <li>Congestion control</li>
+            <li>Higher per-packet overhead</li>
+          </ul>
+          <div className="nsp-compare-uses">
+            <span className="nsp-compare-uses-label">Used by:</span>
+            HTTPS, SSH, SMTP, FTP, SMB, RDP
+          </div>
+        </div>
+        <div className="nsp-compare-col nsp-compare-col--udp">
+          <div className="nsp-compare-header">UDP</div>
+          <ul className="nsp-compare-list">
+            <li>Connectionless — no handshake</li>
+            <li>No delivery guarantee</li>
+            <li>No ordering guarantee</li>
+            <li>No retransmission at transport layer</li>
+            <li>No flow control</li>
+            <li>No congestion control</li>
+            <li>Lower per-packet overhead</li>
+          </ul>
+          <div className="nsp-compare-uses">
+            <span className="nsp-compare-uses-label">Used by:</span>
+            DNS, DHCP, VoIP, video streaming, gaming, NTP, SNMP
+          </div>
+        </div>
+      </div>
+      <InfoBox type="info">
+        <strong>The real trade-off:</strong> UDP offloads reliability to the application or accepts
+        packet loss entirely. A video call drops a frame rather than waiting for a retransmit.
+        DNS uses UDP for small queries (single packet round-trip is trivial) but falls back to
+        TCP when responses exceed the traditional 512-byte limit.
+      </InfoBox>
+      <InfoBox type="warn">
+        <strong>UDP amplification DDoS:</strong> An attacker sends a small UDP request to an open
+        service (DNS, NTP, SSDP) with the source IP spoofed to the victim. The service sends a
+        much larger response to the victim. DNS amplification can exceed 50&times; the request
+        size; NTP monlist can exceed 556&times;. UDP makes this possible — there is no handshake
+        to verify the source IP.
+      </InfoBox>
+      <MCQBlock questions={[
+        { q: 'Which protocol is most appropriate for a real-time video call where some packet loss is acceptable?', options: ['A. TCP — it guarantees delivery','B. UDP — lower overhead with no retransmission delays','C. ICMP — designed for real-time traffic','D. SCTP — combines TCP and UDP features'], answer: 'B' },
+        { q: 'Which port number is assigned to HTTPS?', options: ['A. 80','B. 22','C. 443','D. 8080'], answer: 'C' },
+        { q: 'Why does UDP enable amplification DDoS attacks while TCP does not?', options: ['A. UDP packets are larger','B. UDP has no three-way handshake — source IPs cannot be verified so attackers spoof the victim IP','C. UDP is faster so attacks execute sooner','D. TCP is blocked by most firewalls'], answer: 'B' },
+        { q: 'DNS uses UDP but falls back to TCP under what condition?', options: ['A. When the DNS server is overloaded','B. When the response exceeds 512 bytes or the client requests TCP via EDNS','C. When the query contains special characters','D. TCP is never used for DNS'], answer: 'B' },
+      ]} />
+    </Panel>
+  );
+}
+
+function ArpIcmpNatSection() {
+  return (
+    <Panel id="arp-icmp-nat" title="5. ARP, ICMP &amp; NAT">
+      <SectionIntro>
+        Three protocols below TCP/UDP that are essential for how networks function — and
+        how attackers abuse them.
+      </SectionIntro>
+      <h3 className="nsp-subsection">ARP — Address Resolution Protocol</h3>
+      <p className="nsp-body">
+        IP identifies hosts logically. To deliver a frame on a local network, the sender needs
+        the destination MAC address. ARP resolves IP addresses to MAC addresses on the same segment.
+      </p>
+      <ArpDiagram />
+      <h3 className="nsp-subsection">ICMP — Internet Control Message Protocol</h3>
+      <div className="nsp-concept-grid">
+        <KeyPoint label="Echo Request / Reply">The basis of <code>ping</code>. Sends Echo Request; a live host replies. Measures latency and confirms reachability.</KeyPoint>
+        <KeyPoint label="TTL Exceeded">When TTL reaches 0, the router discards the packet and sends ICMP Time Exceeded back. <code>traceroute</code> exploits this with incrementing TTLs to map each hop.</KeyPoint>
+        <KeyPoint label="Destination Unreachable">Sent when a packet cannot be delivered. Type 3 Code 3 (Port Unreachable) is the UDP scanning response for closed ports.</KeyPoint>
+        <KeyPoint label="Security Relevance">ICMP flood = DoS. ICMP tunnelling encapsulates data in ping packets to exfiltrate through firewalls. Blocking all ICMP breaks <code>ping</code> and <code>traceroute</code> diagnostics.</KeyPoint>
+      </div>
+      <h3 className="nsp-subsection">NAT — Network Address Translation</h3>
+      <NatDiagram />
+      <MCQBlock questions={[
+        { q: 'Why is ARP vulnerable to spoofing?', options: ['A. ARP is an outdated protocol with known bugs','B. ARP has no authentication — any host can claim any IP-to-MAC mapping','C. ARP replies are weakly encrypted','D. ARP only works on wireless networks'], answer: 'B' },
+        { q: 'A traceroute uses ICMP Time Exceeded messages. What does this reveal?', options: ['A. Open ports on the destination','B. Each router hop along the path, showing topology and latency per hop','C. MAC address of each router','D. Whether TLS is enabled on the destination'], answer: 'B' },
+        { q: 'Why is NAT not a replacement for a firewall?', options: ['A. NAT cannot handle IPv6','B. NAT provides no access control, authentication, or inspection — it only translates addresses','C. NAT is too slow for real-time applications','D. NAT requires a separate licence'], answer: 'B' },
+        { q: 'Which command detects active ARP poisoning on a local machine?', options: ['A. netstat -an','B. arp -a (look for two IPs sharing the same MAC address)','C. ipconfig /all','D. ping -t <gateway>'], answer: 'B' },
+      ]} />
+      <ContinueLink {...LINKS.mitm} />
+    </Panel>
+  );
+}
+
+function ServicesSection() {
+  return (
+    <Panel id="services" title="6. Common Network Services">
+      <SectionIntro>
+        Knowing which protocol uses which port, transport, and what its security risks are
+        is fundamental to pen testing, threat modelling, and firewall rule design.
+        Test yourself with the identification exercise first.
+      </SectionIntro>
+      <ProtocolMatcher />
+      <h3 className="nsp-subsection">Protocol Reference Table</h3>
+      <div className="nsp-table-scroll">
+        <table className="nsp-table nsp-table--services">
+          <thead>
+            <tr><th>Protocol</th><th>Port(s)</th><th>Transport</th><th>Purpose</th><th>Security Relevance</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>DNS</td><td>53</td><td>UDP / TCP</td><td>Name resolution</td><td>Poisoning, tunnelling, exfiltration</td></tr>
+            <tr><td>DHCP</td><td>67 / 68</td><td>UDP</td><td>Auto IP assignment</td><td>Rogue DHCP, starvation attacks</td></tr>
+            <tr><td>HTTP</td><td>80</td><td>TCP</td><td>Web — unencrypted</td><td>Eavesdropping, MITM, injection</td></tr>
+            <tr><td>HTTPS</td><td>443</td><td>TCP</td><td>Web — TLS encrypted</td><td>TLS configuration, certificate trust</td></tr>
+            <tr><td>FTP</td><td>21 / 20</td><td>TCP</td><td>File transfer — cleartext</td><td>Credential sniffing; use SFTP instead</td></tr>
+            <tr><td>SFTP / SCP</td><td>22</td><td>TCP</td><td>Encrypted file transfer over SSH</td><td>Same surface as SSH</td></tr>
+            <tr><td>SSH</td><td>22</td><td>TCP</td><td>Encrypted remote shell</td><td>Brute force, key theft</td></tr>
+            <tr><td>Telnet</td><td>23</td><td>TCP</td><td>Remote shell — cleartext</td><td>All data incl. passwords in plaintext</td></tr>
+            <tr><td>SMTP</td><td>25 / 587</td><td>TCP</td><td>Email transmission (MTA to MTA)</td><td>Open relays, spoofing, phishing</td></tr>
+            <tr><td>POP3</td><td>110 / 995</td><td>TCP</td><td>Email retrieval (client)</td><td>Cleartext on 110; use 995 (TLS)</td></tr>
+            <tr><td>IMAP</td><td>143 / 993</td><td>TCP</td><td>Email retrieval with sync</td><td>Cleartext on 143; use 993 (TLS)</td></tr>
+            <tr><td>SMB</td><td>445</td><td>TCP</td><td>Windows file / printer sharing</td><td>EternalBlue, WannaCry, pass-the-hash</td></tr>
+            <tr><td>RDP</td><td>3389</td><td>TCP</td><td>Remote Desktop (Windows)</td><td>Brute force, BlueKeep, ransomware pivot</td></tr>
+            <tr><td>SNMP</td><td>161 / 162</td><td>UDP</td><td>Device management &amp; monitoring</td><td>Default community strings expose config</td></tr>
+            <tr><td>NTP</td><td>123</td><td>UDP</td><td>Time synchronisation</td><td>Amplification DDoS; Kerberos needs sync</td></tr>
+            <tr><td>LDAP</td><td>389 / 636</td><td>TCP</td><td>Directory queries (Active Directory)</td><td>Cleartext on 389; enumeration attacks</td></tr>
+            <tr><td>Kerberos</td><td>88</td><td>TCP / UDP</td><td>AD authentication tickets</td><td>Kerberoasting, AS-REP roasting, Golden Ticket</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <MCQBlock questions={[
+        { q: 'Why is Telnet insecure compared to SSH?', options: ['A. Telnet uses a different port','B. Telnet transmits all data including credentials in plaintext, making it trivially interceptable','C. Telnet does not support remote access','D. Telnet requires more bandwidth'], answer: 'B' },
+        { q: 'The EternalBlue exploit and WannaCry ransomware targeted which service?', options: ['A. HTTP on 80','B. SSH on 22','C. SMB on 445','D. DNS on 53'], answer: 'C' },
+        { q: 'Which protocol automatically assigns IP addresses to hosts?', options: ['A. DNS on 53','B. DHCP on 67/68','C. ARP','D. ICMP'], answer: 'B' },
+        { q: 'Why is NTP important for Active Directory security?', options: ['A. NTP encrypts Kerberos tickets','B. Kerberos fails if clocks drift more than 5 minutes between client and server','C. AD uses NTP to assign IP addresses','D. NTP provides the DC with DNS records'], answer: 'B' },
+        { q: 'An SNMP device responds to the community string "public". What is the risk?', options: ['A. The device is correctly secured','B. "public" is the default — it exposes full device configuration to unauthenticated queries','C. SNMP is encrypted so community strings are safe','D. Read-only community strings pose no risk'], answer: 'B' },
+      ]} />
+    </Panel>
+  );
+}
+
+function SecFundamentalsSection() {
+  return (
+    <Panel id="security" title="7. Network Security Fundamentals">
+      <SectionIntro>
+        Protecting a network requires layered controls. Click each component in the topology
+        diagram to understand its role, then read the core principles below.
+      </SectionIntro>
+      <NetworkSecurityTopology />
+      <h3 className="nsp-subsection">Core Principles</h3>
+      <div className="nsp-concept-grid">
+        <KeyPoint label="Defence in Depth">Multiple independent security controls at different layers. Firewall + IDS + endpoint protection + SIEM together are far more resilient than any single tool.</KeyPoint>
+        <KeyPoint label="Network Segmentation">VLANs and DMZs divide the network into isolated zones. A compromised host in the user VLAN cannot directly reach database servers in a separate segment — limits lateral movement.</KeyPoint>
+        <KeyPoint label="Least Privilege">Hosts communicate only with what they strictly need. All other traffic denied by default. Dramatically reduces blast radius of a compromise.</KeyPoint>
+        <KeyPoint label="Zero Trust">No implicit trust based on network location. Every connection must be authenticated and authorised regardless of source. Implemented via MFA, device trust, micro-segmentation, SASE/ZTNA.</KeyPoint>
+        <KeyPoint label="Encryption in Transit">TLS (HTTPS), SSH (remote access), IPSec (VPN tunnels). Data crossing any untrusted segment must be encrypted.</KeyPoint>
+        <KeyPoint label="Network Monitoring">IDS/IPS detect and block attack patterns. NetFlow records who talked to whom. SIEM correlates all logs. Visibility is the prerequisite for detection.</KeyPoint>
+      </div>
+      <InfoBox type="info">
+        <strong>Micro-segmentation</strong> isolates individual workloads from each other even within the same VLAN — important in cloud and containerised environments.
+      </InfoBox>
+      <InfoBox type="info">
+        <strong>NAC with 802.1X</strong> requires devices to authenticate before receiving an IP address. Rogue devices plugged into a switch port are blocked before they can communicate.
+      </InfoBox>
+      <MCQBlock questions={[
+        { q: 'What is the primary benefit of network segmentation?', options: ['A. It speeds up network traffic','B. It limits lateral movement after a compromise — an attacker cannot reach other zones','C. It eliminates the need for a firewall','D. It reduces infrastructure costs'], answer: 'B' },
+        { q: 'What does Zero Trust assume about internal network connections?', options: ['A. Always trusted because internal','B. No authentication needed on VPN','C. Must still be authenticated and authorised — no implicit trust based on location','D. Encrypted by default'], answer: 'C' },
+        { q: 'Which principle states hosts should communicate only with what they strictly need?', options: ['A. Defence in depth','B. Zero Trust','C. Principle of least privilege applied to network access','D. Network segmentation'], answer: 'C' },
+        { q: 'A DMZ hosts a public web server. What is its primary security purpose?', options: ['A. To make the server faster','B. If the server is compromised, the attacker cannot directly reach the internal network','C. To eliminate the need for TLS','D. To allow direct inbound connections to internal servers'], answer: 'B' },
+      ]} />
+      <ContinueLink {...LINKS.firewall} />
+    </Panel>
+  );
+}
+
+function PracticalSection() {
+  return (
+    <Panel id="practical" title="8. Practical Network Exercises">
+      <SectionIntro>
+        Run these exercises on your own machine or an authorised lab. None require scanning
+        external systems without permission.
+      </SectionIntro>
+      <InfoBox type="warn">
+        Only run these on systems you own or have explicit written authorisation to test.
+        Commands below target <code>localhost</code>, <code>example.com</code> (a designated test domain),
+        or your own local network.
+      </InfoBox>
+      <div className="nsp-exercises">
+        <div className="nsp-exercise">
+          <div className="nsp-exercise-header">
+            <span className="nsp-exercise-num">01</span>
+            <span className="nsp-exercise-title">DNS Resolution</span>
+            <span className="nsp-exercise-difficulty">beginner</span>
+          </div>
+          <p className="nsp-exercise-desc">Query the A record and MX records for example.com.</p>
+          <CodeBlock>{`dig example.com A\ndig example.com MX`}</CodeBlock>
+          <p className="nsp-exercise-learn"><strong>Observe:</strong> The IP in the ANSWER section, the TTL (cache duration), and the authoritative name servers in AUTHORITY.</p>
+        </div>
+        <div className="nsp-exercise">
+          <div className="nsp-exercise-header">
+            <span className="nsp-exercise-num">02</span>
+            <span className="nsp-exercise-title">Connectivity &amp; TTL</span>
+            <span className="nsp-exercise-difficulty">beginner</span>
+          </div>
+          <p className="nsp-exercise-desc">Ping example.com and observe the TTL in replies.</p>
+          <CodeBlock>{`# Linux / macOS\nping -c 4 example.com\n\n# Windows\nping example.com`}</CodeBlock>
+          <p className="nsp-exercise-learn"><strong>Observe:</strong> TTL ~56 suggests Linux destination (started at 64). TTL ~118 suggests Windows (started at 128). Each hop decrements by 1.</p>
+        </div>
+        <div className="nsp-exercise">
+          <div className="nsp-exercise-header">
+            <span className="nsp-exercise-num">03</span>
+            <span className="nsp-exercise-title">Route Tracing</span>
+            <span className="nsp-exercise-difficulty">beginner</span>
+          </div>
+          <p className="nsp-exercise-desc">Trace the network path to example.com.</p>
+          <CodeBlock>{`# Linux / macOS\ntraceroute example.com\n\n# Windows\ntracert example.com`}</CodeBlock>
+          <p className="nsp-exercise-learn"><strong>Observe:</strong> Each line is one router hop. Asterisks (*) mean the router dropped the ICMP probe. IP addresses reveal your ISP, peering points, and CDN ingress nodes.</p>
+        </div>
+        <div className="nsp-exercise">
+          <div className="nsp-exercise-header">
+            <span className="nsp-exercise-num">04</span>
+            <span className="nsp-exercise-title">Listening Services</span>
+            <span className="nsp-exercise-difficulty">beginner</span>
+          </div>
+          <p className="nsp-exercise-desc">List all ports currently listening on your local machine.</p>
+          <CodeBlock>{`# Linux / macOS\nss -tuln\n\n# Windows\nnetstat -ano`}</CodeBlock>
+          <p className="nsp-exercise-learn"><strong>Observe:</strong> LISTEN entries show what is exposed. Port 22 = SSH, 80 = HTTP, 443 = HTTPS, 3389 = RDP. Any unexpected listening port is worth investigating.</p>
+        </div>
+        <div className="nsp-exercise">
+          <div className="nsp-exercise-header">
+            <span className="nsp-exercise-num">05</span>
+            <span className="nsp-exercise-title">Local Service Enumeration</span>
+            <span className="nsp-exercise-difficulty">intermediate</span>
+          </div>
+          <p className="nsp-exercise-desc">Scan your own machine for open ports and service versions. Localhost only.</p>
+          <CodeBlock>nmap -sV localhost</CodeBlock>
+          <p className="nsp-exercise-learn"><strong>Observe:</strong> Service names and versions on open ports. This is the same process used in pen test engagements — understanding your own exposure is the first step in hardening.</p>
+        </div>
+        <div className="nsp-exercise">
+          <div className="nsp-exercise-header">
+            <span className="nsp-exercise-num">06</span>
+            <span className="nsp-exercise-title">ARP Cache Inspection</span>
+            <span className="nsp-exercise-difficulty">beginner</span>
+          </div>
+          <p className="nsp-exercise-desc">Inspect your local ARP cache for IP-to-MAC mappings.</p>
+          <CodeBlock>arp -a</CodeBlock>
+          <p className="nsp-exercise-learn"><strong>Observe:</strong> Your gateway entry. If two different IPs share the same MAC address, ARP spoofing may be active.</p>
+        </div>
+        <div className="nsp-exercise">
+          <div className="nsp-exercise-header">
+            <span className="nsp-exercise-num">07</span>
+            <span className="nsp-exercise-title">TCP Handshake in Wireshark</span>
+            <span className="nsp-exercise-difficulty">intermediate</span>
+          </div>
+          <p className="nsp-exercise-desc">Capture local traffic and identify the TCP three-way handshake.</p>
+          <CodeBlock>{`# In Wireshark:\n# 1. Start capture on active interface\n# 2. Visit http://example.com in browser\n# 3. Stop capture\n# 4. Apply display filter:\ntcp.flags.syn == 1`}</CodeBlock>
+          <p className="nsp-exercise-learn"><strong>Observe:</strong> SYN (no ACK) = client initiating. SYN+ACK = server responding. ACK = handshake complete. Right-click any packet and choose Follow &rarr; TCP Stream.</p>
+        </div>
+      </div>
+      <ContinueLink {...LINKS.recon} />
+    </Panel>
+  );
+}
+
+function NetSecProtocols() {
+  return (
+    <div className="osint-detail-page">
+      <Navbar />
+      <Suspense fallback={<div className="osint-loader">Loading background...</div>}>
+        <div className="osint-shader-bg">
+          <ShaderGradientCanvas style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }}>
+            <ShaderGradient
+              control="query"
+              urlString="https://www.shadergradient.co/customize?animate=on&axesHelper=off&bgColor1=%23000000&bgColor2=%23000000&brightness=0.8&cAzimuthAngle=180&cDistance=3.6&cPolarAngle=90&cameraZoom=1&color1=%2302a89a&color2=%23324a5e&color3=%23000000&destination=onCanvas&embedMode=off&envPreset=city&format=gif&fov=45&frameRate=10&gizmoHelper=hide&grain=on&lightType=3d&pixelDensity=2&positionX=-1.4&positionY=0&positionZ=0&range=enabled&rangeEnd=40&rangeStart=0&reflection=0.1&rotationX=0&rotationY=10&rotationZ=50&shader=defaults&type=plane&uAmplitude=0&uDensity=1.3&uFrequency=5.5&uSpeed=0.1&uStrength=2.4&uTime=0&wireframe=false"
+            />
+          </ShaderGradientCanvas>
+        </div>
+      </Suspense>
+
+      <div className="osint-content-container">
+        <div className="osint-header">
+          <div className="osint-header-icon">
+            <NetworkSecurityIcon />
+          </div>
+          <div className="osint-header-text">
+            <h1 className="osint-header-title">Network Protocols Fundamentals</h1>
+            <p className="osint-header-subtitle">
+              Master OSI layers, TCP/IP, common services, and security principles — the foundation
+              for reconnaissance, traffic analysis, and network defence.
+            </p>
+          </div>
+        </div>
+
+        <div className="osint-learning-objectives">
+          <div className="osint-lo-header">Learning Objectives</div>
+          <ul className="osint-lo-list">
+            <li>Explain the OSI model layers and map attacks to specific layers</li>
+            <li>Understand TCP/IP addressing, subnetting, and CIDR notation</li>
+            <li>Describe how TCP provides reliability via handshakes and sequence numbers</li>
+            <li>Identify when UDP is preferred over TCP and explain UDP amplification attacks</li>
+            <li>Explain ARP, ICMP, and NAT functionality and how they are exploited</li>
+            <li>Recognise common network services, ports, and their security implications</li>
+            <li>Apply defence in depth and Zero Trust principles to network architecture</li>
+            <li>Use command-line tools to inspect local network state and traffic</li>
+          </ul>
+        </div>
+
+        <div className="osint-panels-container">
+          <OsiSection />
+          <TcpIpSection />
+          <TcpSection />
+          <TcpUdpSection />
+          <ArpIcmpNatSection />
+          <ServicesSection />
+          <SecFundamentalsSection />
+          <PracticalSection />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default NetSecProtocols;

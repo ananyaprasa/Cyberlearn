@@ -3,6 +3,7 @@ import User from "../models/User.js";
 import Assignment from "../models/Assignment.js";
 import Submission from "../models/Submission.js";
 import Classroom from "../models/Classroom.js";
+import { getLevelProgress } from "../utils/gamification.js";
 
 // ================= GET USER PROFILE =================
 export const getUserProfile = async (req, res) => {
@@ -140,6 +141,20 @@ export const getUserStats = async (req, res) => {
     const userId = req.user._id;
     const userRole = req.user.role;
 
+    // Always fetch gamification fields
+    const userDoc = await User.findById(userId)
+      .select('xp coins level achievements solvedChallenges role enrolledClasses');
+
+    const gamification = {
+      xp: userDoc.xp || 0,
+      coins: userDoc.coins || 0,
+      level: userDoc.level || 1,
+      levelInfo: getLevelProgress(userDoc.xp || 0),
+      challengesSolved: (userDoc.solvedChallenges || []).length,
+      achievementCount: (userDoc.achievements || []).length,
+      achievements: userDoc.achievements || []
+    };
+
     let stats = {};
 
     if (userRole === 'student') {
@@ -183,7 +198,8 @@ export const getUserStats = async (req, res) => {
         totalPossiblePoints,
         averageGrade,
         completionRate: availableAssignments.length > 0 ? 
-          Math.round((submittedAssignments / availableAssignments.length) * 100) : 0
+          Math.round((submittedAssignments / availableAssignments.length) * 100) : 0,
+        ...gamification
       };
 
     } else if (userRole === 'teacher' || userRole === 'admin') {
@@ -209,7 +225,8 @@ export const getUserStats = async (req, res) => {
         gradedSubmissions: gradedSubmissions.length,
         pendingGrading: pendingGrading.length,
         gradingRate: allSubmissions.length > 0 ? 
-          Math.round((gradedSubmissions.length / allSubmissions.length) * 100) : 0
+          Math.round((gradedSubmissions.length / allSubmissions.length) * 100) : 0,
+        ...gamification
       };
     }
 

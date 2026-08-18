@@ -337,9 +337,123 @@ export const authApi = {
   }
 };
 
+// ================= CTF CHALLENGES API =================
+export const challengesApi = {
+  // Get all published challenges (with optional filters)
+  getAll: async (params = {}) => {
+    try {
+      const query = new URLSearchParams(params).toString();
+      const response = await axiosInstance.get(`/challenges${query ? `?${query}` : ''}`);
+      return handleApiResponse(response);
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  },
+
+  // Get a single challenge by ID
+  getById: async (id) => {
+    try {
+      const response = await axiosInstance.get(`/challenges/${id}`);
+      return handleApiResponse(response);
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  },
+
+  // Submit a flag
+  submitFlag: async (challengeId, flag) => {
+    try {
+      const response = await axiosInstance.post(`/challenges/${challengeId}/submit`, { flag });
+      return handleApiResponse(response);
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  },
+
+  // Unlock a hint (costs coins)
+  unlockHint: async (challengeId, hintIndex) => {
+    try {
+      const response = await axiosInstance.post(`/challenges/${challengeId}/hints/${hintIndex}`);
+      return handleApiResponse(response);
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  },
+
+  // Get leaderboard
+  getLeaderboard: async (limit = 20) => {
+    try {
+      const response = await axiosInstance.get(`/challenges/leaderboard?limit=${limit}`);
+      return handleApiResponse(response);
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  },
+
+  // Get current user's CTF progress
+  getMyProgress: async () => {
+    try {
+      const response = await axiosInstance.get('/challenges/my-progress');
+      return handleApiResponse(response);
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  },
+
+  // Admin/Teacher: get all challenges (incl. unpublished)
+  getAllAdmin: async (params = {}) => {
+    try {
+      const query = new URLSearchParams(params).toString();
+      const response = await axiosInstance.get(`/challenges/admin${query ? `?${query}` : ''}`);
+      return handleApiResponse(response);
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  },
+
+  // Admin/Teacher: create a challenge
+  create: async (challengeData) => {
+    try {
+      const response = await axiosInstance.post('/challenges', challengeData);
+      return handleApiResponse(response);
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  },
+
+  // Admin/Teacher: update a challenge
+  update: async (id, updates) => {
+    try {
+      const response = await axiosInstance.put(`/challenges/${id}`, updates);
+      return handleApiResponse(response);
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  },
+
+  // Admin/Teacher: toggle publish status
+  togglePublish: async (id) => {
+    try {
+      const response = await axiosInstance.patch(`/challenges/${id}/publish`);
+      return handleApiResponse(response);
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  },
+
+  // Admin/Teacher: delete a challenge
+  delete: async (id) => {
+    try {
+      const response = await axiosInstance.delete(`/challenges/${id}`);
+      return handleApiResponse(response);
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+};
+
 // ================= STUDY MATERIALS API =================
-export const materialsApi = {
-  getByClassroom: async (classroomId) => {
+export const materialsApi = {  getByClassroom: async (classroomId) => {
     try {
       const response = await axiosInstance.get(`/classrooms/${classroomId}/materials`);
       return handleApiResponse(response);
@@ -379,6 +493,7 @@ export default {
   assignments: assignmentsApi,
   submissions: submissionsApi,
   classrooms: classroomsApi,
+  challenges: challengesApi,
   materials: materialsApi,
   users: usersApi,
   auth: authApi

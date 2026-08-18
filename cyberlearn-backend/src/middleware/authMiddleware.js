@@ -34,6 +34,25 @@ export const protect = async (req, res, next) => {
   }
 };
 
+/**
+ * Optional authentication — sets req.user if a valid token is present,
+ * but always calls next(). Used for public routes that personalise
+ * their response when a user is logged in (e.g. solved challenge state).
+ */
+export const optionalProtect = async (req, res, next) => {
+  try {
+    const token = req.cookies.token;
+    if (!token) return next(); // no token — proceed as guest
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.id).select("-password");
+    if (user) req.user = user;
+  } catch {
+    // Invalid/expired token — proceed as guest, don't error
+  }
+  next();
+};
+
 // Role-based middleware functions
 export const requireTeacher = (req, res, next) => {
   if (!req.user) {

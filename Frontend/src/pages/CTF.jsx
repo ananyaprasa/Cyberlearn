@@ -6,7 +6,6 @@ import Navbar from "../components/Navbar";
 import { ShaderGradientCanvas, ShaderGradient } from '@shadergradient/react';
 import confetti from "canvas-confetti";
 import { CTFIcon } from '../components/CTFIcon';
-
 const DIFFICULTY_ORDER = ["easy", "medium", "hard"];
 
 const difficultyLabels = {
@@ -22,7 +21,7 @@ const difficultyDescriptions = {
 };
 
 function CTF() {
-  const { challenges, solveChallenge, getStats } = useChallenges();
+  const { challenges, solveChallenge, unlockHint, getStats, isLoading } = useChallenges();
   
   // one flag input per challenge
   const [flags, setFlags] = useState({});
@@ -30,6 +29,10 @@ function CTF() {
   const [wrongId, setWrongId] = useState(null);
   // track just solved for glow animation
   const [justSolvedId, setJustSolvedId] = useState(null);
+  // hint unlock loading state per challenge-hintIndex key
+  const [hintLoading, setHintLoading] = useState({});
+  // hint messages (error or revealed text)
+  const [hintMessages, setHintMessages] = useState({});
   // animated display values
   const [displayPoints, setDisplayPoints] = useState(0);
   const [displaySolved, setDisplaySolved] = useState(0);
@@ -38,6 +41,28 @@ function CTF() {
 
   const stats = getStats();
   const totalPoints = challenges.reduce((sum, c) => sum + c.points, 0);
+
+  // Handle hint unlock
+  const handleUnlockHint = async (challenge, hintIndex) => {
+    const key = `${challenge.id}-${hintIndex}`;
+    setHintLoading(prev => ({ ...prev, [key]: true }));
+    setHintMessages(prev => ({ ...prev, [key]: null }));
+
+    const result = await unlockHint(challenge.id, hintIndex);
+
+    if (result.success) {
+      setHintMessages(prev => ({
+        ...prev,
+        [key]: { type: 'success', text: result.hint }
+      }));
+    } else {
+      setHintMessages(prev => ({
+        ...prev,
+        [key]: { type: 'error', text: result.message || 'Could not unlock hint.' }
+      }));
+    }
+    setHintLoading(prev => ({ ...prev, [key]: false }));
+  };
 
   // animate header numbers when progress changes
   useEffect(() => {
@@ -75,17 +100,19 @@ function CTF() {
     setFlags((prev) => ({ ...prev, [id]: value }));
   };
 
-  const handleSubmit = (challenge) => {
+  const handleSubmit = async (challenge) => {
     const value = (flags[challenge.id] || "").trim();
     if (!value) return;
 
-    const success = solveChallenge(challenge.id, value);
+    const result = await solveChallenge(challenge.id, value);
+    // result is { success, correct, ... } from API or { success, correct } from static fallback
+    const success = typeof result === 'object' ? result.correct : result;
 
     if (success) {
       // ✅ correct
-      setWrongId(null);                // clear any previous error
-      setJustSolvedId(challenge.id);   // trigger confetti + glow
-      setFlags(prev => ({ ...prev, [challenge.id]: "" })); // clear input
+      setWrongId(null);
+      setJustSolvedId(challenge.id);
+      setFlags(prev => ({ ...prev, [challenge.id]: "" }));
 
       // Trigger confetti animation
       confetti({
@@ -338,6 +365,47 @@ function CTF() {
                             >
                               📥 Download Image
                             </a>
+                          </div>
+                        )}
+
+                        {/* ── Hints panel ────────────────────────────── */}
+                        {!isSolved && challenge.hints && challenge.hints.length > 0 && (
+                          <div className="hints-panel">
+                            <div className="hints-label">💡 Hints</div>
+                            {challenge.hints.map((hint, hIdx) => {
+                              const key = `${challenge.id}-${hIdx}`;
+                              const isUnlocked = hint.isUnlocked;
+                              const loading = hintLoading[key];
+                              const msg = hintMessages[key];
+
+                              return (
+                                <div key={hIdx} className={`hint-item ${isUnlocked ? 'hint-unlocked' : ''}`}>
+                                  {isUnlocked ? (
+                                    <div className="hint-text">
+                                      <span className="hint-icon">🔓</span>
+                                      {hint.text || (msg?.text)}
+                                    </div>
+                                  ) : (
+                                    <div className="hint-locked">
+                                      <span className="hint-icon">🔒</span>
+                                      <span className="hint-cost">Hint {hIdx + 1} — {hint.cost} coins</span>
+                                      <button
+                                        className="hint-unlock-btn"
+                                        onClick={() => handleUnlockHint(challenge, hIdx)}
+                                        disabled={loading}
+                                      >
+                                        {loading ? '...' : 'Unlock'}
+                                      </button>
+                                    </div>
+                                  )}
+                                  {msg && !isUnlocked && (
+                                    <div className={`hint-msg hint-msg-${msg.type}`}>
+                                      {msg.text}
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            })}
                           </div>
                         )}
 

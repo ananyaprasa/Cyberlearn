@@ -15,6 +15,7 @@ import classroomRoutes from "./routes/classroomRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import chatRoutes from "./routes/chatRoutes.js";
 import studyMaterialRoutes from "./routes/studyMaterialRoutes.js";
+import challengeRoutes from "./routes/challengeRoutes.js";
 import { errorHandler, notFound } from "./middleware/errorMiddleware.js";
 
 import path from "path";
@@ -98,6 +99,7 @@ app.use("/api/classrooms/:id/materials", studyMaterialRoutes);
 app.use("/api/materials", studyMaterialRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/chat", chatRoutes);
+app.use("/api/challenges", challengeRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

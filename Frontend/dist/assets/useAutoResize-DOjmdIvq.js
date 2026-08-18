@@ -1,0 +1,1 @@
+import{r as o}from"./react-core-cLmpMfOL.js";function n(t,r,c){const s=o.useCallback(()=>{const e=t.current;if(!e)return;e.style.height="auto";const i=e.scrollHeight;e.style.height=i+"px",e.style.overflowY="hidden"},[t,c]);o.useEffect(()=>{s()},[r,s])}export{n as u};
